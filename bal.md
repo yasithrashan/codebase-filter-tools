@@ -1,42 +1,79 @@
-Module: (default)
+File: weather-tool.ts
+---------------------
+Module: Weather CLI Tool
 Imports:
+  - zod (z)
+  - ai-sdk ("generateText", "tool", "stepCountIs")
+  - @ai-sdk/google (google)
 
-- ballerina/io
+Environment Variables:
+  - OPENWEATHER_API_KEY: string
 
-Type Definitions:
-
-- record DatabaseErrorDetail:
-  fields:
-  int code
-  string reason
-- record NetworkErrorDetail:
-  fields:
-  string 'type
-  string phase
-  int elapsedTime
-- type DatabaseError:
-  alias: error<DatabaseErrorDetail>
-- type NetworkError:
-  alias: error<NetworkErrorDetail>
-
-Constant Definitions:
-
-- string ERROR = "Generic Error"
+Tool Definitions:
+  - tool name: "weather"
+    description: "Get the real weather in a location using OpenWeather API"
+    inputSchema:
+      object:
+        location: string
+    execute(location):
+      1. geo = getGeoLocation(location)
+      2. if geo exists:
+           weatherData = getWeather(geo.lat, geo.lon)
+      3. return weatherData
 
 Function Definitions:
+  - getGeoLocation(location: string) → Promise<{ name: string, lat: number, lon: number }>
+      - Call OpenWeather Geocoding API
+      - Parse JSON array
+      - If empty → throw error
+      - Return first element { name, lat, lon }
 
-- function errorMatch(error e):
-  match patterns: 1. var error DatabaseError(code = code):
-  action: print "Matched DatabaseError with code: {code}" 2. var error(ERROR, code = code):
-  action: print "Matched Generic Error with message: {ERROR} and code: {code}" 3. var error(message, 'type = errorType, ...otherDetails):
-  action: print "Matched NetworkError with message: {message}, type: {errorType}, phase: {otherDetails["phase"]}, elapsedTime: {otherDetails["elapsedTime"]}"
+  - getWeather(lat: number, lon: number) → Promise<object>
+      - Call OpenWeather Current Weather API
+      - Units: metric
+      - Parse and return JSON response
 
-- function main():
-  variables:
-  e1: error("Generic Error", code = 20)
-  e2: DatabaseError("Database Error", code = 2, reason = "connection failure")
-  e3: NetworkError("Bad Request", 'type = "http error", phase = "application", elapsedTime = 338)
-  calls:
-  errorMatch(e1)
-  errorMatch(e2)
-  errorMatch(e3)
+CLI Argument Handling:
+  - locationArg = process.argv[2]
+  - If missing → print usage and exit
+
+Main Execution:
+  - Call generateText():
+      model: google("gemini-2.0-flash")
+      tools: { weather }
+      stopWhen: stepCountIs(5)
+      prompt: "Use the weather tool to tell me the weather in ${locationArg}."
+  - Print weatherResult.text
+
+
+File: tree-sitter.ts
+--------------------
+Module: JavaScript Parser CLI
+Imports:
+  - tree-sitter (Parser)
+  - tree-sitter-javascript (JavaScript)
+  - https
+  - fetch (global)
+
+Variable Definitions:
+  - parser = new Parser()
+      - setLanguage(JavaScript)
+
+Function Definitions:
+  - fetchData(url: string) → Promise<string>
+      - Fetch the URL
+      - If response not ok → throw error
+      - Return response text
+
+  - printTree(node, indent = 0)
+      - Print node type and first 50 chars of text
+      - Recursively print child nodes with increased indent
+
+Main Execution:
+  - url = process.argv[2]
+  - If missing → print error
+  - Try:
+      - sourceCode = fetchData(url)
+      - tree = parser.parse(sourceCode)
+      - printTree(tree.rootNode)
+  - Catch errors → print error
