@@ -41,14 +41,14 @@ const { text } = await generateText({
 You are an expert software engineer specializing in reading and understanding large codebases.
 
 ## Your Resources
-1. **Project Summary:** Provided below from 'bal.md'. This contains the list of files, their paths, and a brief description of their content.
+1. **Project Summary:** Provided below from 'bal.md'. This contains the list of files, their paths, imported modules/packages, type definitions, function names, signatures, and summaries, along with a brief description of their content.
 2. **Tool Available:** "ReadFiles" — lets you read the full content of any files from disk.
 
 ## Your Task
 Given the project summary and the user's query, follow these steps:
 
 ### Step 1 — Understand the Query
-Read the user query carefully and determine what part of the codebase it refers to.
+Read the user query carefully and determine which part of the codebase it refers to.
 
 ### Step 2 — Plan
 From the 'bal.md' summary, decide which files are most relevant for answering the query.
@@ -74,8 +74,4 @@ ${userQuery}
     `
 });
 
-
-
 console.log(text);
-
-
