@@ -1,37 +1,121 @@
 {
   "codebase": {
-    "name": "Authentication System",
-    "description": "TypeScript authentication system with login, signup, and signout functionality",
+    "name": "Enhanced Authentication System",
+    "description": "Comprehensive TypeScript authentication system with advanced user management, session handling, and validation",
     "files": [
       {
         "fileName": "auth.ts",
         "path": "./auth.ts",
         "type": "module",
-        "lineCount": 12,
+        "lineCount": 98,
         "ast": {
+          "imports": [],
           "exports": [
             {
               "name": "User",
-              "type": "type_alias",
+              "type": "interface",
               "kind": "export",
-              "lineNumber": 2,
+              "lineNumber": 5,
               "definition": {
-                "type": "object",
-                "startLine": 2,
-                "endLine": 5,
+                "type": "interface",
+                "startLine": 5,
+                "endLine": 17,
                 "properties": [
-                  {
-                    "name": "username",
-                    "type": "string",
-                    "lineNumber": 3,
-                    "required": true
-                  },
-                  {
-                    "name": "password",
-                    "type": "string",
-                    "lineNumber": 4,
-                    "required": true
-                  }
+                  {"name": "id", "type": "string", "lineNumber": 6, "required": true},
+                  {"name": "username", "type": "string", "lineNumber": 7, "required": true},
+                  {"name": "password", "type": "string", "lineNumber": 8, "required": true},
+                  {"name": "email", "type": "string", "lineNumber": 9, "required": true},
+                  {"name": "firstName", "type": "string", "lineNumber": 10, "required": true},
+                  {"name": "lastName", "type": "string", "lineNumber": 11, "required": true},
+                  {"name": "isActive", "type": "boolean", "lineNumber": 12, "required": true},
+                  {"name": "createdAt", "type": "Date", "lineNumber": 13, "required": true},
+                  {"name": "lastLoginAt", "type": "Date", "lineNumber": 14, "required": false},
+                  {"name": "role", "type": "UserRole", "lineNumber": 15, "required": true},
+                  {"name": "profilePicture", "type": "string", "lineNumber": 16, "required": false}
+                ]
+              }
+            },
+            {
+              "name": "UserRole",
+              "type": "enum",
+              "kind": "export",
+              "lineNumber": 19,
+              "definition": {
+                "type": "enum",
+                "startLine": 19,
+                "endLine": 24,
+                "members": [
+                  {"name": "ADMIN", "value": "admin", "lineNumber": 20},
+                  {"name": "USER", "value": "user", "lineNumber": 21},
+                  {"name": "MODERATOR", "value": "moderator", "lineNumber": 22},
+                  {"name": "GUEST", "value": "guest", "lineNumber": 23}
+                ]
+              }
+            },
+            {
+              "name": "LoginCredentials",
+              "type": "interface",
+              "kind": "export",
+              "lineNumber": 26,
+              "definition": {
+                "type": "interface",
+                "startLine": 26,
+                "endLine": 30,
+                "properties": [
+                  {"name": "username", "type": "string", "lineNumber": 27, "required": true},
+                  {"name": "password", "type": "string", "lineNumber": 28, "required": true},
+                  {"name": "rememberMe", "type": "boolean", "lineNumber": 29, "required": false}
+                ]
+              }
+            },
+            {
+              "name": "SignupData",
+              "type": "interface",
+              "kind": "export",
+              "lineNumber": 32,
+              "definition": {
+                "type": "interface",
+                "startLine": 32,
+                "endLine": 39,
+                "properties": [
+                  {"name": "username", "type": "string", "lineNumber": 33, "required": true},
+                  {"name": "password", "type": "string", "lineNumber": 34, "required": true},
+                  {"name": "confirmPassword", "type": "string", "lineNumber": 35, "required": true},
+                  {"name": "email", "type": "string", "lineNumber": 36, "required": true},
+                  {"name": "firstName", "type": "string", "lineNumber": 37, "required": true},
+                  {"name": "lastName", "type": "string", "lineNumber": 38, "required": true}
+                ]
+              }
+            },
+            {
+              "name": "AuthResult",
+              "type": "interface",
+              "kind": "export",
+              "lineNumber": 41,
+              "definition": {
+                "type": "interface",
+                "startLine": 41,
+                "endLine": 46,
+                "properties": [
+                  {"name": "success", "type": "boolean", "lineNumber": 42, "required": true},
+                  {"name": "message", "type": "string", "lineNumber": 43, "required": true},
+                  {"name": "user", "type": "Partial<User>", "lineNumber": 44, "required": false},
+                  {"name": "token", "type": "string", "lineNumber": 45, "required": false}
+                ]
+              }
+            },
+            {
+              "name": "ValidationResult",
+              "type": "interface",
+              "kind": "export",
+              "lineNumber": 48,
+              "definition": {
+                "type": "interface",
+                "startLine": 48,
+                "endLine": 51,
+                "properties": [
+                  {"name": "isValid", "type": "boolean", "lineNumber": 49, "required": true},
+                  {"name": "errors", "type": "string[]", "lineNumber": 50, "required": true}
                 ]
               }
             },
@@ -39,69 +123,46 @@
               "name": "validateUsername",
               "type": "function",
               "kind": "export",
-              "lineNumber": 7,
-              "parameters": [
-                {
-                  "name": "username",
-                  "type": "string",
-                  "lineNumber": 7
-                }
-              ],
-              "returnType": "boolean",
-              "body": {
-                "startLine": 7,
-                "endLine": 9,
-                "type": "return_statement",
-                "lineNumber": 8,
-                "expression": {
-                  "type": "logical_and",
-                  "left": {
-                    "type": "typeof_check",
-                    "variable": "username",
-                    "expectedType": "string"
-                  },
-                  "right": {
-                    "type": "comparison",
-                    "left": "username.length",
-                    "operator": ">=",
-                    "right": 3
-                  }
-                }
-              }
+              "lineNumber": 57,
+              "parameters": [{"name": "username", "type": "string"}],
+              "returnType": "ValidationResult",
+              "body": {"startLine": 57, "endLine": 87, "complexity": "high"}
             },
             {
               "name": "validatePassword",
               "type": "function",
               "kind": "export",
-              "lineNumber": 11,
-              "parameters": [
-                {
-                  "name": "password",
-                  "type": "string",
-                  "lineNumber": 11
-                }
-              ],
-              "returnType": "boolean",
-              "body": {
-                "startLine": 11,
-                "endLine": 13,
-                "type": "return_statement",
-                "lineNumber": 12,
-                "expression": {
-                  "type": "logical_and",
-                  "left": {
-                    "type": "typeof_check",
-                    "variable": "password",
-                    "expectedType": "string"
-                  },
-                  "right": {
-                    "type": "comparison",
-                    "left": "password.length",
-                    "operator": ">=",
-                    "right": 6
-                  }
-                }
-              }
+              "lineNumber": 93,
+              "parameters": [{"name": "password", "type": "string"}],
+              "returnType": "ValidationResult",
+              "body": {"startLine": 93, "endLine": 126, "complexity": "high"}
+            },
+            {
+              "name": "validateEmail",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 132,
+              "parameters": [{"name": "email", "type": "string"}],
+              "returnType": "ValidationResult",
+              "body": {"startLine": 132, "endLine": 154, "complexity": "medium"}
+            },
+            {
+              "name": "generateUserId",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 160,
+              "parameters": [],
+              "returnType": "string",
+              "body": {"startLine": 160, "endLine": 162, "complexity": "low"}
+            },
+            {
+              "name": "hashPassword",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 168,
+              "parameters": [{"name": "password", "type": "string"}],
+              "returnType": "string",
+              "body": {"startLine": 168, "endLine": 171, "complexity": "low"}
             }
           ]
         }
@@ -110,18 +171,17 @@
         "fileName": "login.ts",
         "path": "./login.ts",
         "type": "module",
-        "lineCount": 24,
+        "lineCount": 174,
         "ast": {
           "imports": [
             {
               "source": "./auth",
-              "lineNumber": 2,
+              "lineNumber": 1,
               "imports": [
-                {
-                  "name": "User",
-                  "type": "type",
-                  "importType": "named"
-                }
+                {"name": "User", "type": "type", "importType": "named"},
+                {"name": "LoginCredentials", "type": "type", "importType": "named"},
+                {"name": "AuthResult", "type": "type", "importType": "named"},
+                {"name": "UserRole", "type": "enum", "importType": "named"}
               ]
             }
           ],
@@ -130,145 +190,50 @@
               "name": "login",
               "type": "function",
               "kind": "export",
-              "lineNumber": 4,
-              "parameters": [
-                {
-                  "name": "username",
-                  "type": "string"
-                },
-                {
-                  "name": "password",
-                  "type": "string"
-                }
-              ],
-              "returnType": "string",
-              "body": {
-                "startLine": 4,
-                "endLine": 19,
-                "statements": [
-                  {
-                    "type": "variable_declaration",
-                    "name": "mockUsers",
-                    "varType": "User[]",
-                    "lineNumber": 5,
-                    "endLine": 8,
-                    "value": {
-                      "type": "array_literal",
-                      "elements": [
-                        {
-                          "type": "object_literal",
-                          "lineNumber": 6,
-                          "properties": [
-                            {"key": "username", "value": "alice"},
-                            {"key": "password", "value": "password123"}
-                          ]
-                        },
-                        {
-                          "type": "object_literal",
-                          "lineNumber": 7,
-                          "properties": [
-                            {"key": "username", "value": "bob"},
-                            {"key": "password", "value": "mypassword"}
-                          ]
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "type": "variable_declaration",
-                    "name": "user",
-                    "lineNumber": 10,
-                    "value": {
-                      "type": "method_call",
-                      "object": "mockUsers",
-                      "method": "find",
-                      "arguments": [
-                        {
-                          "type": "arrow_function",
-                          "parameter": "u",
-                          "body": {
-                            "type": "comparison",
-                            "left": "u.username",
-                            "operator": "===",
-                            "right": "username"
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "type": "if_statement",
-                    "lineNumber": 12,
-                    "condition": {
-                      "type": "negation",
-                      "operand": "user"
-                    },
-                    "then": {
-                      "type": "return_statement",
-                      "lineNumber": 13,
-                      "value": "Username not found."
-                    }
-                  },
-                  {
-                    "type": "if_statement",
-                    "lineNumber": 16,
-                    "condition": {
-                      "type": "comparison",
-                      "left": "user.password",
-                      "operator": "!==",
-                      "right": "password"
-                    },
-                    "then": {
-                      "type": "return_statement",
-                      "lineNumber": 17,
-                      "value": "Incorrect password."
-                    }
-                  },
-                  {
-                    "type": "return_statement",
-                    "lineNumber": 20,
-                    "value": {
-                      "type": "template_literal",
-                      "template": "User ${username} logged in successfully.",
-                      "substitutions": ["username"]
-                    }
-                  }
-                ]
-              }
+              "lineNumber": 53,
+              "parameters": [{"name": "credentials", "type": "LoginCredentials"}],
+              "returnType": "AuthResult",
+              "body": {"startLine": 53, "endLine": 125, "complexity": "high"}
+            },
+            {
+              "name": "getUserByToken",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 131,
+              "parameters": [{"name": "token", "type": "string"}],
+              "returnType": "User | null",
+              "body": {"startLine": 131, "endLine": 145, "complexity": "medium"}
+            },
+            {
+              "name": "getActiveSessions",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 151,
+              "parameters": [],
+              "returnType": "Array<{userId: string, username: string, expiresAt: Date}>",
+              "body": {"startLine": 151, "endLine": 169, "complexity": "medium"}
             }
           ],
           "statements": [
             {
-              "type": "expression_statement",
-              "lineNumber": 22,
-              "expression": {
-                "type": "method_call",
-                "object": "console",
-                "method": "log",
-                "arguments": [
-                  {
-                    "type": "function_call",
-                    "function": "login",
-                    "arguments": ["alice", "password123"]
-                  }
-                ]
-              }
+              "type": "variable_declaration",
+              "name": "mockUsers",
+              "varType": "User[]",
+              "lineNumber": 6,
+              "endLine": 37,
+              "value": {"type": "array_literal", "complexity": "high"}
+            },
+            {
+              "type": "variable_declaration",
+              "name": "activeSessions",
+              "varType": "Map<string, SessionData>",
+              "lineNumber": 42,
+              "value": {"type": "map_constructor"}
             },
             {
               "type": "expression_statement",
-              "lineNumber": 23,
-              "expression": {
-                "type": "method_call",
-                "object": "console",
-                "method": "log",
-                "arguments": [
-                  {
-                    "type": "function_call",
-                    "function": "login",
-                    "arguments": ["bob", "wrongpass"]
-                  }
-                ]
-              }
+              "lineNumber": 171,
+              "expression": {"type": "method_call", "object": "console", "method": "log"}
             }
           ]
         }
@@ -277,84 +242,109 @@
         "fileName": "signout.ts",
         "path": "./signout.ts",
         "type": "module",
-        "lineCount": 13,
+        "lineCount": 243,
         "ast": {
+          "imports": [
+            {
+              "source": "./auth",
+              "lineNumber": 5,
+              "imports": [
+                {"name": "AuthResult", "type": "type", "importType": "named"}
+              ]
+            }
+          ],
           "exports": [
+            {
+              "name": "addSession",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 21,
+              "parameters": [
+                {"name": "username", "type": "string"},
+                {"name": "sessionData", "type": "SessionData", "optional": true}
+              ],
+              "returnType": "string",
+              "body": {"startLine": 21, "endLine": 36, "complexity": "medium"}
+            },
+            {
+              "name": "updateActivity",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 42,
+              "parameters": [{"name": "sessionToken", "type": "string"}],
+              "returnType": "void",
+              "body": {"startLine": 42, "endLine": 48, "complexity": "low"}
+            },
+            {
+              "name": "getSession",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 54,
+              "parameters": [{"name": "sessionToken", "type": "string"}],
+              "returnType": "session data or null",
+              "body": {"startLine": 54, "endLine": 56, "complexity": "low"}
+            },
             {
               "name": "signout",
               "type": "function",
               "kind": "export",
-              "lineNumber": 2,
+              "lineNumber": 63,
               "parameters": [
-                {
-                  "name": "currentUser",
-                  "type": "string",
-                  "optional": true
-                }
+                {"name": "currentUser", "type": "string", "optional": true},
+                {"name": "sessionToken", "type": "string", "optional": true}
               ],
-              "returnType": "string",
-              "body": {
-                "startLine": 2,
-                "endLine": 9,
-                "statements": [
-                  {
-                    "type": "if_statement",
-                    "lineNumber": 3,
-                    "condition": {
-                      "type": "negation",
-                      "operand": "currentUser"
-                    },
-                    "then": {
-                      "type": "return_statement",
-                      "lineNumber": 4,
-                      "value": "No user is currently logged in."
-                    }
-                  },
-                  {
-                    "type": "return_statement",
-                    "lineNumber": 7,
-                    "value": {
-                      "type": "template_literal",
-                      "template": "User ${currentUser} signed out successfully.",
-                      "substitutions": ["currentUser"]
-                    }
-                  }
-                ]
-              }
+              "returnType": "AuthResult",
+              "body": {"startLine": 63, "endLine": 139, "complexity": "high"}
+            },
+            {
+              "name": "signoutAll",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 145,
+              "parameters": [],
+              "returnType": "AuthResult",
+              "body": {"startLine": 145, "endLine": 163, "complexity": "medium"}
+            },
+            {
+              "name": "getActiveSessionsCount",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 169,
+              "parameters": [],
+              "returnType": "number",
+              "body": {"startLine": 169, "endLine": 171, "complexity": "low"}
+            },
+            {
+              "name": "getActiveUsers",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 177,
+              "parameters": [],
+              "returnType": "Array<UserSessionInfo>",
+              "body": {"startLine": 177, "endLine": 200, "complexity": "medium"}
+            },
+            {
+              "name": "cleanupInactiveSessions",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 206,
+              "parameters": [],
+              "returnType": "number",
+              "body": {"startLine": 206, "endLine": 218, "complexity": "medium"}
             }
           ],
           "statements": [
             {
-              "type": "expression_statement",
-              "lineNumber": 11,
-              "expression": {
-                "type": "method_call",
-                "object": "console",
-                "method": "log",
-                "arguments": [
-                  {
-                    "type": "function_call",
-                    "function": "signout",
-                    "arguments": ["alice"]
-                  }
-                ]
-              }
+              "type": "variable_declaration",
+              "name": "userSessions",
+              "varType": "Map<string, SessionInfo>",
+              "lineNumber": 10,
+              "value": {"type": "map_constructor"}
             },
             {
               "type": "expression_statement",
-              "lineNumber": 12,
-              "expression": {
-                "type": "method_call",
-                "object": "console",
-                "method": "log",
-                "arguments": [
-                  {
-                    "type": "function_call",
-                    "function": "signout",
-                    "arguments": []
-                  }
-                ]
-              }
+              "lineNumber": 221,
+              "expression": {"type": "method_call", "object": "console", "method": "log"}
             }
           ]
         }
@@ -363,34 +353,29 @@
         "fileName": "signup.ts",
         "path": "./signup.ts",
         "type": "module",
-        "lineCount": 18,
+        "lineCount": 318,
         "ast": {
           "imports": [
             {
               "source": "./auth",
               "lineNumber": 1,
               "imports": [
-                {
-                  "name": "User",
-                  "type": "type",
-                  "importType": "named"
-                }
+                {"name": "User", "type": "type", "importType": "named"},
+                {"name": "SignupData", "type": "type", "importType": "named"},
+                {"name": "AuthResult", "type": "type", "importType": "named"},
+                {"name": "UserRole", "type": "enum", "importType": "named"},
+                {"name": "ValidationResult", "type": "type", "importType": "named"}
               ]
             },
             {
               "source": "./auth",
               "lineNumber": 2,
               "imports": [
-                {
-                  "name": "validateUsername",
-                  "type": "function",
-                  "importType": "named"
-                },
-                {
-                  "name": "validatePassword",
-                  "type": "function",
-                  "importType": "named"
-                }
+                {"name": "validateUsername", "type": "function", "importType": "named"},
+                {"name": "validatePassword", "type": "function", "importType": "named"},
+                {"name": "validateEmail", "type": "function", "importType": "named"},
+                {"name": "generateUserId", "type": "function", "importType": "named"},
+                {"name": "hashPassword", "type": "function", "importType": "named"}
               ]
             }
           ],
@@ -399,80 +384,76 @@
               "name": "signup",
               "type": "function",
               "kind": "export",
-              "lineNumber": 4,
-              "parameters": [
-                {
-                  "name": "username",
-                  "type": "string"
-                },
-                {
-                  "name": "password",
-                  "type": "string"
-                }
-              ],
-              "returnType": "string",
-              "body": {
-                "startLine": 4,
-                "endLine": 17,
-                "statements": [
-                  {
-                    "type": "if_statement",
-                    "lineNumber": 5,
-                    "condition": {
-                      "type": "negation",
-                      "operand": {
-                        "type": "function_call",
-                        "function": "validateUsername",
-                        "arguments": ["username"]
-                      }
-                    },
-                    "then": {
-                      "type": "return_statement",
-                      "lineNumber": 6,
-                      "value": "Invalid username. Must be at least 3 characters."
-                    }
-                  },
-                  {
-                    "type": "if_statement",
-                    "lineNumber": 8,
-                    "condition": {
-                      "type": "negation",
-                      "operand": {
-                        "type": "function_call",
-                        "function": "validatePassword",
-                        "arguments": ["password"]
-                      }
-                    },
-                    "then": {
-                      "type": "return_statement",
-                      "lineNumber": 9,
-                      "value": "Invalid password. Must be at least 6 characters."
-                    }
-                  },
-                  {
-                    "type": "variable_declaration",
-                    "name": "newUser",
-                    "varType": "User",
-                    "lineNumber": 12,
-                    "value": {
-                      "type": "object_literal",
-                      "properties": [
-                        {"key": "username", "value": "username"},
-                        {"key": "password", "value": "password"}
-                      ]
-                    }
-                  },
-                  {
-                    "type": "return_statement",
-                    "lineNumber": 13,
-                    "value": {
-                      "type": "template_literal",
-                      "template": "User ${newUser.username} signed up successfully.",
-                      "substitutions": ["newUser.username"]
-                    }
-                  }
-                ]
-              }
+              "lineNumber": 133,
+              "parameters": [{"name": "signupData", "type": "SignupData"}],
+              "returnType": "AuthResult",
+              "body": {"startLine": 133, "endLine": 179, "complexity": "high"}
+            },
+            {
+              "name": "getUserByUsername",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 185,
+              "parameters": [{"name": "username", "type": "string"}],
+              "returnType": "User | null",
+              "body": {"startLine": 185, "endLine": 189, "complexity": "low"}
+            },
+            {
+              "name": "getUserByEmail",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 195,
+              "parameters": [{"name": "email", "type": "string"}],
+              "returnType": "User | null",
+              "body": {"startLine": 195, "endLine": 199, "complexity": "low"}
+            },
+            {
+              "name": "getRegisteredUsersCount",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 205,
+              "parameters": [],
+              "returnType": "number",
+              "body": {"startLine": 205, "endLine": 207, "complexity": "low"}
+            },
+            {
+              "name": "getRegistrationStats",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 213,
+              "parameters": [],
+              "returnType": "RegistrationStatsObject",
+              "body": {"startLine": 213, "endLine": 233, "complexity": "medium"}
+            }
+          ],
+          "statements": [
+            {
+              "type": "variable_declaration",
+              "name": "registeredUsers",
+              "varType": "User[]",
+              "lineNumber": 7,
+              "value": {"type": "array_literal"}
+            },
+            {
+              "type": "variable_declaration",
+              "name": "RESERVED_USERNAMES",
+              "varType": "string[]",
+              "lineNumber": 12,
+              "endLine": 15,
+              "value": {"type": "array_literal"}
+            },
+            {
+              "type": "variable_declaration",
+              "name": "BLACKLISTED_DOMAINS",
+              "varType": "string[]",
+              "lineNumber": 20,
+              "endLine": 22,
+              "value": {"type": "array_literal"}
+            },
+            {
+              "type": "expression_statement",
+              "lineNumber": 236,
+              "expression": {"type": "method_call", "object": "console", "method": "log"}
             }
           ]
         }
@@ -483,20 +464,44 @@
         {
           "from": "login.ts",
           "to": "auth.ts",
-          "imports": ["User"],
-          "lineNumber": 2
+          "imports": ["User", "LoginCredentials", "AuthResult", "UserRole"],
+          "lineNumber": 1
+        },
+        {
+          "from": "signout.ts",
+          "to": "auth.ts",
+          "imports": ["AuthResult"],
+          "lineNumber": 5
         },
         {
           "from": "signup.ts",
           "to": "auth.ts",
-          "imports": ["User", "validateUsername", "validatePassword"],
+          "imports": ["User", "SignupData", "AuthResult", "UserRole", "ValidationResult", "validateUsername", "validatePassword", "validateEmail", "generateUserId", "hashPassword"],
           "lineNumbers": [1, 2]
         }
       ],
       "external": []
     },
-    "totalLines": 67,
-    "totalFunctions": 4,
-    "totalTypes": 1
+    "codeComplexity": {
+      "totalLines": 833,
+      "totalFunctions": 22,
+      "totalTypes": 6,
+      "totalInterfaces": 5,
+      "totalEnums": 1,
+      "cyclomaticComplexity": "medium-high",
+      "maintainabilityIndex": "good"
+    },
+    "features": [
+      "User authentication and authorization",
+      "Session management with tokens",
+      "Comprehensive input validation",
+      "Password hashing and security",
+      "User registration and profile management",
+      "Admin functions and analytics",
+      "Session cleanup and maintenance",
+      "Role-based access control",
+      "Email validation and domain filtering",
+      "Username reservation system"
+    ]
   }
 }

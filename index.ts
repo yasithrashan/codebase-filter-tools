@@ -14,7 +14,7 @@ if (!balMdContent.length) {
 const codebaseAst = JSON.parse(fs.readFileSync("./ast.json", "utf8"));
 
 // === User query ===
-const userQuery: string = "can you add two more users to the database?";
+const userQuery: string = "Update auth.ts to add a ProfileUpdateData interface with optional fields email, firstName, lastName, profilePicture and a validateProfileUpdate() function that ensures email uniqueness if changed.";
 logToFile("User Query", userQuery);
 
 // === Tool: QueryAST ===
@@ -61,7 +61,7 @@ const queryAST = tool({
   const response = await generateText({
     model: openai("gpt-4.1-mini"),
     tools: { queryAST },
-    stopWhen: stepCountIs(4),
+    stopWhen: stepCountIs(8),
     prompt: `
 You are an expert software engineer specializing in reading and understanding large codebases.
 
