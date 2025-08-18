@@ -2,7 +2,9 @@ import { openai } from "@ai-sdk/openai";
 import { generateText, stepCountIs, tool } from "ai";
 import { z } from "zod";
 import * as fs from "fs";
+import { logToFile } from "./logger";
 
+// Load project files
 const balMdContent = fs.readFileSync("./bal.md", "utf8");
 if (!balMdContent.length) {
   console.error("Error: bal.md is empty or missing");
@@ -11,29 +13,25 @@ if (!balMdContent.length) {
 
 const codebaseAst = JSON.parse(fs.readFileSync("./ast.json", "utf8"));
 
+// === User query ===
 const userQuery: string = "can you add two more users to the database?";
+logToFile("User Query", userQuery);
 
+// === Tool: QueryAST ===
 const queryAST = tool({
   name: "QueryAST",
-  description:
-    "Retrieve code snippets from the AST. Use this when you need specific functions, types, or exports instead of entire files.",
+  description: "Retrieve AST nodes for specific functions, types, or exports.",
   inputSchema: z.object({
     symbols: z
       .array(z.string())
       .describe('List of function/type names to fetch, e.g., ["login", "User"]'),
   }),
   execute: async ({ symbols }) => {
-    console.log(`QueryAST tool called. Requested symbols: ${symbols.join(", ")}`);
-
     const results: any[] = [];
 
     function searchAst(node: any, parentFile: string) {
       if (node.name && symbols.includes(node.name)) {
-        results.push({
-          symbol: node.name,
-          file: parentFile,
-          node,
-        });
+        results.push({ symbol: node.name, file: parentFile, node });
       }
       if (node.exports)
         node.exports.forEach((child: any) =>
@@ -45,18 +43,22 @@ const queryAST = tool({
         );
     }
 
-    codebaseAst.codebase.files.forEach((file: any) => {
-      searchAst(file.ast, file.fileName);
-    });
+    codebaseAst.codebase.files.forEach((file: any) =>
+      searchAst(file.ast, file.fileName)
+    );
 
-    return results.length
+    const toolResponse = results.length
       ? results
       : `No symbols found for ${symbols.join(", ")}`;
+
+    logToFile("Tool Response", JSON.stringify(toolResponse, null, 2));
+    return toolResponse;
   },
 });
 
+// === Main run ===
 (async () => {
-  const { text } = await generateText({
+  const response = await generateText({
     model: openai("gpt-4.1-mini"),
     tools: { queryAST },
     stopWhen: stepCountIs(4),
@@ -67,35 +69,26 @@ You are an expert software engineer specializing in reading and understanding la
 1. **Project Summary (bal.md):**
 ${balMdContent}
 
-2. **Tool Available:** "QueryAST" — lets you fetch only specific functions, types, or exports from the AST.
-   - For example, request ["login"] to get the login function AST.
-
-3. **AST:** The full AST of the project is available to the QueryAST tool.
+2. **Tool Available:** "QueryAST" — fetches specific AST nodes.
+3. **AST:** The project's AST is available to the tool.
 
 ## Task
-Given the project summary and the user's query:
+Follow these steps:
+- Understand user query
+- Decide relevant symbols
+- Call QueryAST tool
+- Modify code if needed
+- Return updated code
 
-### Step 1 — Understand the Query
-Read the user query carefully and determine which part of the codebase it refers to.
-
-### Step 2 — Plan
-From the 'bal.md' summary, decide which functions or types are most relevant.
-Select **only the minimal set of symbols** needed.
-
-### Step 3 — Retrieve Content
-Use the **QueryAST** tool to load the full AST nodes of those symbols.
-
-### Step 4 — Answer
-Once you have the AST nodes, update or modify the code as required by the user query.
-Return the updated code in your final answer.
-
----
-
-## User Query
-${userQuery}
+User Query: ${userQuery}
     `,
   });
 
-  console.log("\n=== LLM Response ===\n");
-  console.log(text);
+  // Log results
+  logToFile("LLM Usage", JSON.stringify(response.usage, null, 2));
+  logToFile("LLM Response", response.text);
+  logToFile("Final Output", response.text);
+
+  console.log("\n=== Final Output ===\n");
+  console.log(response.text);
 })();
