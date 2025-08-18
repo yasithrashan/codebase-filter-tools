@@ -1,74 +1,63 @@
-Program
-├── SourceFile: "auth.ts"
-│   ├── ExportDeclaration
-│   │   └── TypeAliasDeclaration: "User"
-│   │       └── TypeLiteral
-│   │           ├── PropertySignature: "username" → StringKeyword
-│   │           └── PropertySignature: "password" → StringKeyword
-│   ├── ExportDeclaration
-│   │   └── FunctionDeclaration: "validateUsername"
-│   │       ├── Parameter: "username" → StringKeyword
-│   │       ├── ReturnType: BooleanKeyword
-│   │       └── Block
-│   │           └── ReturnStatement
-│   │               └── BinaryExpression (&&)
-│   └── ExportDeclaration
-│       └── FunctionDeclaration: "validatePassword"
-│           ├── Parameter: "password" → StringKeyword
-│           ├── ReturnType: BooleanKeyword
-│           └── Block
-│               └── ReturnStatement
-│                   └── BinaryExpression (&&)
-│
-├── SourceFile: "login.ts"
-│   ├── ImportDeclaration
-│   │   └── ImportClause
-│   │       └── NamedImports: "User" (type-only) from "./auth"
-│   ├── ExportDeclaration
-│   │   └── FunctionDeclaration: "login"
-│   │       ├── Parameter: "username" → StringKeyword
-│   │       ├── Parameter: "password" → StringKeyword
-│   │       ├── ReturnType: StringKeyword
-│   │       └── Block
-│   │           ├── VariableStatement: "mockUsers"
-│   │           │   └── ArrayLiteralExpression
-│   │           ├── VariableStatement: "user"
-│   │           ├── IfStatement (user not found)
-│   │           ├── IfStatement (password mismatch)
-│   │           └── ReturnStatement
-│   ├── CallExpression: console.log
-│   │   └── CallExpression: login("alice", "password123")
-│   └── CallExpression: console.log
-│       └── CallExpression: login("bob", "wrongpass")
-│
-├── SourceFile: "signout.ts"
-│   ├── ExportDeclaration
-│   │   └── FunctionDeclaration: "signout"
-│   │       ├── Parameter: "currentUser" (optional) → StringKeyword
-│   │       ├── ReturnType: StringKeyword
-│   │       └── Block
-│   │           ├── IfStatement (!currentUser)
-│   │           └── ReturnStatement
-│   ├── CallExpression: console.log
-│   │   └── CallExpression: signout("alice")
-│   └── CallExpression: console.log
-│       └── CallExpression: signout()
-│
-└── SourceFile: "signup.ts" (inline)
-    ├── ImportDeclaration
-    │   └── ImportClause
-    │       └── NamedImports: "User" (type-only) from "./auth"
-    ├── ImportDeclaration
-    │   └── ImportClause
-    │       └── NamedImports: "validateUsername", "validatePassword" from "./auth"
-    └── ExportDeclaration
-        └── FunctionDeclaration: "signup"
-            ├── Parameter: "username" → StringKeyword
-            ├── Parameter: "password" → StringKeyword
-            ├── ReturnType: StringKeyword
-            └── Block
-                ├── IfStatement (username validation)
-                ├── IfStatement (password validation)
-                ├── VariableStatement: "newUser"
-                │   └── ObjectLiteralExpression
-                └── ReturnStatement
+# Simple Summary of the Codebase
+
+## auth.ts
+
+**imports**
+- none
+
+**types**
+- User: {username: string, password: string}
+
+**functions**
+- validateUsername
+  - doc comments: Validates if username meets minimum requirements
+  - parameters: username: string
+  - return: boolean
+- validatePassword
+  - doc comments: Checks if password meets security criteria
+  - parameters: password: string
+  - return: boolean
+
+## login.ts
+
+**imports**
+- User from ./auth
+
+**types**
+- no types
+
+**functions**
+- login
+  - doc comments: Authenticates user with username and password against mock database
+  - parameters: username: string, password: string
+  - return: string
+
+## signout.ts
+
+**imports**
+- none
+
+**types**
+- no types
+
+**functions**
+- signout
+  - doc comments: no doc comments
+  - parameters: currentUser?: string
+  - return: string
+
+## signup.ts
+
+**imports**
+- User from ./auth
+- validateUsername from ./auth
+- validatePassword from ./auth
+
+**types**
+- no types
+
+**functions**
+- signup
+  - doc comments: Creates new user account after validating credentials
+  - parameters: username: string, password: string
+  - return: string

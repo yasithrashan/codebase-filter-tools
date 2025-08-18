@@ -1,0 +1,502 @@
+{
+  "codebase": {
+    "name": "Authentication System",
+    "description": "TypeScript authentication system with login, signup, and signout functionality",
+    "files": [
+      {
+        "fileName": "auth.ts",
+        "path": "./auth.ts",
+        "type": "module",
+        "lineCount": 12,
+        "ast": {
+          "exports": [
+            {
+              "name": "User",
+              "type": "type_alias",
+              "kind": "export",
+              "lineNumber": 2,
+              "definition": {
+                "type": "object",
+                "startLine": 2,
+                "endLine": 5,
+                "properties": [
+                  {
+                    "name": "username",
+                    "type": "string",
+                    "lineNumber": 3,
+                    "required": true
+                  },
+                  {
+                    "name": "password",
+                    "type": "string",
+                    "lineNumber": 4,
+                    "required": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "validateUsername",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 7,
+              "parameters": [
+                {
+                  "name": "username",
+                  "type": "string",
+                  "lineNumber": 7
+                }
+              ],
+              "returnType": "boolean",
+              "body": {
+                "startLine": 7,
+                "endLine": 9,
+                "type": "return_statement",
+                "lineNumber": 8,
+                "expression": {
+                  "type": "logical_and",
+                  "left": {
+                    "type": "typeof_check",
+                    "variable": "username",
+                    "expectedType": "string"
+                  },
+                  "right": {
+                    "type": "comparison",
+                    "left": "username.length",
+                    "operator": ">=",
+                    "right": 3
+                  }
+                }
+              }
+            },
+            {
+              "name": "validatePassword",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 11,
+              "parameters": [
+                {
+                  "name": "password",
+                  "type": "string",
+                  "lineNumber": 11
+                }
+              ],
+              "returnType": "boolean",
+              "body": {
+                "startLine": 11,
+                "endLine": 13,
+                "type": "return_statement",
+                "lineNumber": 12,
+                "expression": {
+                  "type": "logical_and",
+                  "left": {
+                    "type": "typeof_check",
+                    "variable": "password",
+                    "expectedType": "string"
+                  },
+                  "right": {
+                    "type": "comparison",
+                    "left": "password.length",
+                    "operator": ">=",
+                    "right": 6
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fileName": "login.ts",
+        "path": "./login.ts",
+        "type": "module",
+        "lineCount": 24,
+        "ast": {
+          "imports": [
+            {
+              "source": "./auth",
+              "lineNumber": 2,
+              "imports": [
+                {
+                  "name": "User",
+                  "type": "type",
+                  "importType": "named"
+                }
+              ]
+            }
+          ],
+          "exports": [
+            {
+              "name": "login",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 4,
+              "parameters": [
+                {
+                  "name": "username",
+                  "type": "string"
+                },
+                {
+                  "name": "password",
+                  "type": "string"
+                }
+              ],
+              "returnType": "string",
+              "body": {
+                "startLine": 4,
+                "endLine": 19,
+                "statements": [
+                  {
+                    "type": "variable_declaration",
+                    "name": "mockUsers",
+                    "varType": "User[]",
+                    "lineNumber": 5,
+                    "endLine": 8,
+                    "value": {
+                      "type": "array_literal",
+                      "elements": [
+                        {
+                          "type": "object_literal",
+                          "lineNumber": 6,
+                          "properties": [
+                            {"key": "username", "value": "alice"},
+                            {"key": "password", "value": "password123"}
+                          ]
+                        },
+                        {
+                          "type": "object_literal",
+                          "lineNumber": 7,
+                          "properties": [
+                            {"key": "username", "value": "bob"},
+                            {"key": "password", "value": "mypassword"}
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "variable_declaration",
+                    "name": "user",
+                    "lineNumber": 10,
+                    "value": {
+                      "type": "method_call",
+                      "object": "mockUsers",
+                      "method": "find",
+                      "arguments": [
+                        {
+                          "type": "arrow_function",
+                          "parameter": "u",
+                          "body": {
+                            "type": "comparison",
+                            "left": "u.username",
+                            "operator": "===",
+                            "right": "username"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "if_statement",
+                    "lineNumber": 12,
+                    "condition": {
+                      "type": "negation",
+                      "operand": "user"
+                    },
+                    "then": {
+                      "type": "return_statement",
+                      "lineNumber": 13,
+                      "value": "Username not found."
+                    }
+                  },
+                  {
+                    "type": "if_statement",
+                    "lineNumber": 16,
+                    "condition": {
+                      "type": "comparison",
+                      "left": "user.password",
+                      "operator": "!==",
+                      "right": "password"
+                    },
+                    "then": {
+                      "type": "return_statement",
+                      "lineNumber": 17,
+                      "value": "Incorrect password."
+                    }
+                  },
+                  {
+                    "type": "return_statement",
+                    "lineNumber": 20,
+                    "value": {
+                      "type": "template_literal",
+                      "template": "User ${username} logged in successfully.",
+                      "substitutions": ["username"]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "statements": [
+            {
+              "type": "expression_statement",
+              "lineNumber": 22,
+              "expression": {
+                "type": "method_call",
+                "object": "console",
+                "method": "log",
+                "arguments": [
+                  {
+                    "type": "function_call",
+                    "function": "login",
+                    "arguments": ["alice", "password123"]
+                  }
+                ]
+              }
+            },
+            {
+              "type": "expression_statement",
+              "lineNumber": 23,
+              "expression": {
+                "type": "method_call",
+                "object": "console",
+                "method": "log",
+                "arguments": [
+                  {
+                    "type": "function_call",
+                    "function": "login",
+                    "arguments": ["bob", "wrongpass"]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fileName": "signout.ts",
+        "path": "./signout.ts",
+        "type": "module",
+        "lineCount": 13,
+        "ast": {
+          "exports": [
+            {
+              "name": "signout",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 2,
+              "parameters": [
+                {
+                  "name": "currentUser",
+                  "type": "string",
+                  "optional": true
+                }
+              ],
+              "returnType": "string",
+              "body": {
+                "startLine": 2,
+                "endLine": 9,
+                "statements": [
+                  {
+                    "type": "if_statement",
+                    "lineNumber": 3,
+                    "condition": {
+                      "type": "negation",
+                      "operand": "currentUser"
+                    },
+                    "then": {
+                      "type": "return_statement",
+                      "lineNumber": 4,
+                      "value": "No user is currently logged in."
+                    }
+                  },
+                  {
+                    "type": "return_statement",
+                    "lineNumber": 7,
+                    "value": {
+                      "type": "template_literal",
+                      "template": "User ${currentUser} signed out successfully.",
+                      "substitutions": ["currentUser"]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "statements": [
+            {
+              "type": "expression_statement",
+              "lineNumber": 11,
+              "expression": {
+                "type": "method_call",
+                "object": "console",
+                "method": "log",
+                "arguments": [
+                  {
+                    "type": "function_call",
+                    "function": "signout",
+                    "arguments": ["alice"]
+                  }
+                ]
+              }
+            },
+            {
+              "type": "expression_statement",
+              "lineNumber": 12,
+              "expression": {
+                "type": "method_call",
+                "object": "console",
+                "method": "log",
+                "arguments": [
+                  {
+                    "type": "function_call",
+                    "function": "signout",
+                    "arguments": []
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "fileName": "signup.ts",
+        "path": "./signup.ts",
+        "type": "module",
+        "lineCount": 18,
+        "ast": {
+          "imports": [
+            {
+              "source": "./auth",
+              "lineNumber": 1,
+              "imports": [
+                {
+                  "name": "User",
+                  "type": "type",
+                  "importType": "named"
+                }
+              ]
+            },
+            {
+              "source": "./auth",
+              "lineNumber": 2,
+              "imports": [
+                {
+                  "name": "validateUsername",
+                  "type": "function",
+                  "importType": "named"
+                },
+                {
+                  "name": "validatePassword",
+                  "type": "function",
+                  "importType": "named"
+                }
+              ]
+            }
+          ],
+          "exports": [
+            {
+              "name": "signup",
+              "type": "function",
+              "kind": "export",
+              "lineNumber": 4,
+              "parameters": [
+                {
+                  "name": "username",
+                  "type": "string"
+                },
+                {
+                  "name": "password",
+                  "type": "string"
+                }
+              ],
+              "returnType": "string",
+              "body": {
+                "startLine": 4,
+                "endLine": 17,
+                "statements": [
+                  {
+                    "type": "if_statement",
+                    "lineNumber": 5,
+                    "condition": {
+                      "type": "negation",
+                      "operand": {
+                        "type": "function_call",
+                        "function": "validateUsername",
+                        "arguments": ["username"]
+                      }
+                    },
+                    "then": {
+                      "type": "return_statement",
+                      "lineNumber": 6,
+                      "value": "Invalid username. Must be at least 3 characters."
+                    }
+                  },
+                  {
+                    "type": "if_statement",
+                    "lineNumber": 8,
+                    "condition": {
+                      "type": "negation",
+                      "operand": {
+                        "type": "function_call",
+                        "function": "validatePassword",
+                        "arguments": ["password"]
+                      }
+                    },
+                    "then": {
+                      "type": "return_statement",
+                      "lineNumber": 9,
+                      "value": "Invalid password. Must be at least 6 characters."
+                    }
+                  },
+                  {
+                    "type": "variable_declaration",
+                    "name": "newUser",
+                    "varType": "User",
+                    "lineNumber": 12,
+                    "value": {
+                      "type": "object_literal",
+                      "properties": [
+                        {"key": "username", "value": "username"},
+                        {"key": "password", "value": "password"}
+                      ]
+                    }
+                  },
+                  {
+                    "type": "return_statement",
+                    "lineNumber": 13,
+                    "value": {
+                      "type": "template_literal",
+                      "template": "User ${newUser.username} signed up successfully.",
+                      "substitutions": ["newUser.username"]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "dependencies": {
+      "internal": [
+        {
+          "from": "login.ts",
+          "to": "auth.ts",
+          "imports": ["User"],
+          "lineNumber": 2
+        },
+        {
+          "from": "signup.ts",
+          "to": "auth.ts",
+          "imports": ["User", "validateUsername", "validatePassword"],
+          "lineNumbers": [1, 2]
+        }
+      ],
+      "external": []
+    },
+    "totalLines": 67,
+    "totalFunctions": 4,
+    "totalTypes": 1
+  }
+}

@@ -1,79 +1,101 @@
 import { openai } from "@ai-sdk/openai";
 import { generateText, stepCountIs, tool } from "ai";
-import { z } from 'zod';
-import * as fs from 'fs';
-import path from "path";
+import { z } from "zod";
+import * as fs from "fs";
 
-const balMdContent = fs.readFileSync('./bal.md', 'utf8');
+const balMdContent = fs.readFileSync("./bal.md", "utf8");
 if (!balMdContent.length) {
-    console.log('There is and error for get content of the bal.md content')
+  console.error("Error: bal.md is empty or missing");
+  process.exit(1);
 }
 
-const userQuery: string = 'can you add two more uses to the database?';
+const codebaseAst = JSON.parse(fs.readFileSync("./ast.json", "utf8"));
 
-const readFiles = tool({
-    name: 'ReadFiles',
-    description: 'Reads the contents of files and returns them as plain text.',
-    inputSchema: z.object({
-        fileNames: z.union([
-            z.string(),
-            z.array(z.string())
-        ]).describe('One or more file names to read')
-    }),
-    execute: async ({ fileNames }) => {
-        const files = Array.isArray(fileNames) ? fileNames : [fileNames];
-        console.log(`ReadFiles tool called. Requested files: ${files.join(', ')}`);
+const userQuery: string = "can you add two more users to the database?";
 
-        const results = files.map(fileName => {
-            const fullPath = path.join('tests', fileName);
-            const fileContent = fs.readFileSync(fullPath, 'utf-8');
-            console.log(`Successfully read: ${fileName}`);
-            return { fileName, fileContent };
+const queryAST = tool({
+  name: "QueryAST",
+  description:
+    "Retrieve code snippets from the AST. Use this when you need specific functions, types, or exports instead of entire files.",
+  inputSchema: z.object({
+    symbols: z
+      .array(z.string())
+      .describe('List of function/type names to fetch, e.g., ["login", "User"]'),
+  }),
+  execute: async ({ symbols }) => {
+    console.log(`QueryAST tool called. Requested symbols: ${symbols.join(", ")}`);
+
+    const results: any[] = [];
+
+    function searchAst(node: any, parentFile: string) {
+      if (node.name && symbols.includes(node.name)) {
+        results.push({
+          symbol: node.name,
+          file: parentFile,
+          node,
         });
-        return results;
-    },
+      }
+      if (node.exports)
+        node.exports.forEach((child: any) =>
+          searchAst(child, node.fileName || parentFile)
+        );
+      if (node.statements)
+        node.statements.forEach((child: any) =>
+          searchAst(child, node.fileName || parentFile)
+        );
+    }
+
+    codebaseAst.codebase.files.forEach((file: any) => {
+      searchAst(file.ast, file.fileName);
+    });
+
+    return results.length
+      ? results
+      : `No symbols found for ${symbols.join(", ")}`;
+  },
 });
 
-
-const { text } = await generateText({
-    model: openai('gpt-4.1-mini'),
-    tools: { readFiles },
+(async () => {
+  const { text } = await generateText({
+    model: openai("gpt-4.1-mini"),
+    tools: { queryAST },
     stopWhen: stepCountIs(4),
     prompt: `
 You are an expert software engineer specializing in reading and understanding large codebases.
 
 ## Your Resources
-1. **Project Summary:** Provided below from 'bal.md'. This contains the list of files, their paths, imported modules/packages, type definitions, function names, signatures, and summaries, along with a brief description of their content.
-2. **Tool Available:** "ReadFiles" — lets you read the full content of any files from disk.
+1. **Project Summary (bal.md):**
+${balMdContent}
 
-## Your Task
-Given the project summary and the user's query, follow these steps:
+2. **Tool Available:** "QueryAST" — lets you fetch only specific functions, types, or exports from the AST.
+   - For example, request ["login"] to get the login function AST.
+
+3. **AST:** The full AST of the project is available to the QueryAST tool.
+
+## Task
+Given the project summary and the user's query:
 
 ### Step 1 — Understand the Query
 Read the user query carefully and determine which part of the codebase it refers to.
 
 ### Step 2 — Plan
-From the 'bal.md' summary, decide which files are most relevant for answering the query.
-Select **only the minimal set of files** required for the task.
+From the 'bal.md' summary, decide which functions or types are most relevant.
+Select **only the minimal set of symbols** needed.
 
 ### Step 3 — Retrieve Content
-Use the **ReadFiles** tool to load the full content of the selected files.
-Pass **the exact file paths** as arguments.
+Use the **QueryAST** tool to load the full AST nodes of those symbols.
 
 ### Step 4 — Answer
-Once you have the file contents, update or modify the code as required by the user query.
-Provide the updated code in your final answer.
-
----
-
-## Project Summary (bal.md)
-${balMdContent}
+Once you have the AST nodes, update or modify the code as required by the user query.
+Return the updated code in your final answer.
 
 ---
 
 ## User Query
 ${userQuery}
-    `
-});
+    `,
+  });
 
-console.log(text);
+  console.log("\n=== LLM Response ===\n");
+  console.log(text);
+})();
