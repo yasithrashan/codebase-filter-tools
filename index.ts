@@ -2,6 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { generateText, stepCountIs, tool } from "ai";
 import { z } from 'zod';
 import * as fs from 'fs';
+import path from "path";
 
 const balMdContent = fs.readFileSync('./bal.md', 'utf8');
 if (!balMdContent.length) {
@@ -24,7 +25,8 @@ const readFiles = tool({
         console.log(`ReadFiles tool called. Requested files: ${files.join(', ')}`);
 
         const results = files.map(fileName => {
-            const fileContent = fs.readFileSync(fileName, 'utf-8');
+            const fullPath = path.join('tests', fileName);
+            const fileContent = fs.readFileSync(fullPath, 'utf-8');
             console.log(`Successfully read: ${fileName}`);
             return { fileName, fileContent };
         });
