@@ -1,0 +1,320 @@
+
+
+=== Total AST Characters ===
+4324
+
+
+=== User Query ===
+Modify the authentication system to add optional email support in signup, track the current user in login/signout, and add a simple resetPassword function in auth.ts.
+
+
+=== Tool Response ===
+[
+  {
+    "symbol": "signup",
+    "file": "signup.ts",
+    "node": {
+      "name": "signup",
+      "type": "function",
+      "kind": "export",
+      "lineNumber": 5,
+      "parameters": [
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "password",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "returnType": "User | string"
+    }
+  }
+]
+
+
+=== Tool Response ===
+[
+  {
+    "symbol": "login",
+    "file": "login.ts",
+    "node": {
+      "name": "login",
+      "type": "function",
+      "kind": "export",
+      "lineNumber": 6,
+      "parameters": [
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "password",
+          "type": "string"
+        }
+      ],
+      "returnType": "string"
+    }
+  },
+  {
+    "symbol": "getCurrentUser",
+    "file": "login.ts",
+    "node": {
+      "name": "getCurrentUser",
+      "type": "function",
+      "kind": "export",
+      "lineNumber": 17,
+      "parameters": [],
+      "returnType": "string | null"
+    }
+  },
+  {
+    "symbol": "setCurrentUser",
+    "file": "login.ts",
+    "node": {
+      "name": "setCurrentUser",
+      "type": "function",
+      "kind": "export",
+      "lineNumber": 20,
+      "parameters": [
+        {
+          "name": "username",
+          "type": "string | null"
+        }
+      ],
+      "returnType": "void"
+    }
+  }
+]
+
+
+=== Tool Response ===
+[
+  {
+    "symbol": "resetPassword",
+    "file": "auth.ts",
+    "node": {
+      "name": "resetPassword",
+      "type": "function",
+      "kind": "export",
+      "lineNumber": 19,
+      "parameters": [
+        {
+          "name": "user",
+          "type": "User"
+        },
+        {
+          "name": "newPassword",
+          "type": "string"
+        }
+      ],
+      "returnType": "string"
+    }
+  }
+]
+
+
+=== LLM Usage ===
+{
+  "inputTokens": 993,
+  "outputTokens": 497,
+  "totalTokens": 1490,
+  "reasoningTokens": 0,
+  "cachedInputTokens": 0
+}
+
+
+=== LLM Response ===
+```typescript
+// auth.ts
+export type User = {
+  username: string;
+  password: string;
+  email?: string;
+};
+
+export function validateUsername(username: string): boolean {
+  return username.length >= 3;
+}
+
+export function validatePassword(password: string): boolean {
+  return password.length >= 6;
+}
+
+export function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export function resetPassword(user: User, newPassword: string): string {
+  if (!validatePassword(newPassword)) {
+    return 'Password does not meet security criteria';
+  }
+  user.password = newPassword;
+  return 'Password reset successfully';
+}
+```
+
+```typescript
+// login.ts
+import { User, validateUsername, validatePassword } from './auth';
+
+let currentUser: string | null = null;
+
+export function login(username: string, password: string): string {
+  // Mock database check
+  if (!validateUsername(username)) {
+    return 'Invalid username';
+  }
+  if (!validatePassword(password)) {
+    return 'Invalid password';
+  }
+  currentUser = username;
+  return 'Login successful';
+}
+
+export function getCurrentUser(): string | null {
+  return currentUser;
+}
+
+export function setCurrentUser(username: string | null): void {
+  currentUser = username;
+}
+```
+
+```typescript
+// signout.ts
+import { getCurrentUser, setCurrentUser } from './login';
+
+export function signout(): string {
+  const user = getCurrentUser();
+  if (!user) {
+    return 'No user currently signed in';
+  }
+  setCurrentUser(null);
+  return 'User signed out successfully';
+}
+```
+
+```typescript
+// signup.ts
+import { User, validateUsername, validatePassword, validateEmail } from './auth';
+
+export function signup(username: string, password: string, email?: string): User | string {
+  if (!validateUsername(username)) {
+    return 'Invalid username';
+  }
+  if (!validatePassword(password)) {
+    return 'Invalid password';
+  }
+  if (email !== undefined && !validateEmail(email)) {
+    return 'Invalid email';
+  }
+  const newUser: User = { username, password };
+  if (email !== undefined) {
+    newUser.email = email;
+  }
+  return newUser;
+}
+```
+
+
+=== Final Output ===
+```typescript
+// auth.ts
+export type User = {
+  username: string;
+  password: string;
+  email?: string;
+};
+
+export function validateUsername(username: string): boolean {
+  return username.length >= 3;
+}
+
+export function validatePassword(password: string): boolean {
+  return password.length >= 6;
+}
+
+export function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export function resetPassword(user: User, newPassword: string): string {
+  if (!validatePassword(newPassword)) {
+    return 'Password does not meet security criteria';
+  }
+  user.password = newPassword;
+  return 'Password reset successfully';
+}
+```
+
+```typescript
+// login.ts
+import { User, validateUsername, validatePassword } from './auth';
+
+let currentUser: string | null = null;
+
+export function login(username: string, password: string): string {
+  // Mock database check
+  if (!validateUsername(username)) {
+    return 'Invalid username';
+  }
+  if (!validatePassword(password)) {
+    return 'Invalid password';
+  }
+  currentUser = username;
+  return 'Login successful';
+}
+
+export function getCurrentUser(): string | null {
+  return currentUser;
+}
+
+export function setCurrentUser(username: string | null): void {
+  currentUser = username;
+}
+```
+
+```typescript
+// signout.ts
+import { getCurrentUser, setCurrentUser } from './login';
+
+export function signout(): string {
+  const user = getCurrentUser();
+  if (!user) {
+    return 'No user currently signed in';
+  }
+  setCurrentUser(null);
+  return 'User signed out successfully';
+}
+```
+
+```typescript
+// signup.ts
+import { User, validateUsername, validatePassword, validateEmail } from './auth';
+
+export function signup(username: string, password: string, email?: string): User | string {
+  if (!validateUsername(username)) {
+    return 'Invalid username';
+  }
+  if (!validatePassword(password)) {
+    return 'Invalid password';
+  }
+  if (email !== undefined && !validateEmail(email)) {
+    return 'Invalid email';
+  }
+  const newUser: User = { username, password };
+  if (email !== undefined) {
+    newUser.email = email;
+  }
+  return newUser;
+}
+```

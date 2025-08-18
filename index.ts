@@ -13,8 +13,12 @@ if (!balMdContent.length) {
 
 const codebaseAst = JSON.parse(fs.readFileSync("./ast.json", "utf8"));
 
+const totalAstChars = JSON.stringify(codebaseAst).length;
+logToFile("Total AST Characters", totalAstChars.toString());
+console.log("Total AST characters:", totalAstChars);
+
 // === User query ===
-const userQuery: string = "Update auth.ts to add a ProfileUpdateData interface with optional fields email, firstName, lastName, profilePicture and a validateProfileUpdate() function that ensures email uniqueness if changed.";
+const userQuery: string = "Modify the authentication system to add optional email support in signup, track the current user in login/signout, and add a simple resetPassword function in auth.ts.";
 logToFile("User Query", userQuery);
 
 // === Tool: QueryAST ===
@@ -61,7 +65,7 @@ const queryAST = tool({
   const response = await generateText({
     model: openai("gpt-4.1-mini"),
     tools: { queryAST },
-    stopWhen: stepCountIs(8),
+    stopWhen: stepCountIs(15),
     prompt: `
 You are an expert software engineer specializing in reading and understanding large codebases.
 
@@ -78,7 +82,7 @@ Follow these steps:
 - Decide relevant symbols
 - Call QueryAST tool
 - Modify code if needed
-- Return updated code
+- Return the updated code only, without questions
 
 User Query: ${userQuery}
     `,
