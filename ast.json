@@ -1,13 +1,116 @@
 {
   "codebase": {
-    "name": "Authentication System",
-    "description": "TypeScript authentication system with login, signup, and signout functionality, including optional email and password reset",
+    "name": "Ballerina Service",
+    "description": "Ballerina service with user, product, order management and authentication endpoints",
     "files": [
       {
-        "fileName": "auth.ts",
-        "path": "./auth.ts",
+        "fileName": "main.bal",
+        "path": "./main.bal",
         "type": "module",
-        "lineCount": 20,
+        "lineCount": 138,
+        "ast": {
+          "imports": [
+            { "source": "ballerina/http", "lineNumber": 1, "imports": [] },
+            { "source": "ballerina/time", "lineNumber": 2, "imports": [] }
+          ],
+          "exports": [],
+          "statements": [
+            { "type": "configurable_variable", "name": "serverPort", "varType": "int", "lineNumber": 4, "isConstant": false },
+            {
+              "type": "service",
+              "name": "/",
+              "lineNumber": 6,
+              "resources": [
+                {
+                  "name": "users",
+                  "method": "get",
+                  "parameters": [],
+                  "returnType": "User[]|http:InternalServerError",
+                  "lineNumber": 8
+                },
+                {
+                  "name": "products",
+                  "method": "get",
+                  "parameters": [],
+                  "returnType": "Product[]|http:InternalServerError",
+                  "lineNumber": 15
+                },
+                {
+                  "name": "orders",
+                  "method": "get",
+                  "parameters": [],
+                  "returnType": "Order[]|http:InternalServerError",
+                  "lineNumber": 22
+                },
+                {
+                  "name": "health",
+                  "method": "get",
+                  "parameters": [],
+                  "returnType": "HealthStatus|http:InternalServerError",
+                  "lineNumber": 31
+                },
+                {
+                  "name": "status",
+                  "method": "get",
+                  "parameters": [],
+                  "returnType": "ServerStatus|http:InternalServerError",
+                  "lineNumber": 38
+                },
+                {
+                  "name": "users",
+                  "method": "post",
+                  "parameters": [
+                    { "name": "userRequest", "type": "CreateUserRequest" }
+                  ],
+                  "returnType": "User|http:BadRequest|http:InternalServerError",
+                  "lineNumber": 45
+                },
+                {
+                  "name": "products",
+                  "method": "post",
+                  "parameters": [
+                    { "name": "productRequest", "type": "CreateProductRequest" }
+                  ],
+                  "returnType": "Product|http:BadRequest|http:InternalServerError",
+                  "lineNumber": 63
+                },
+                {
+                  "name": "orders",
+                  "method": "post",
+                  "parameters": [
+                    { "name": "orderRequest", "type": "CreateOrderRequest" }
+                  ],
+                  "returnType": "Order|http:BadRequest|http:InternalServerError",
+                  "lineNumber": 81
+                },
+                {
+                  "name": "login",
+                  "method": "post",
+                  "parameters": [
+                    { "name": "loginRequest", "type": "LoginRequest" }
+                  ],
+                  "returnType": "AuthResponse|http:Unauthorized|http:BadRequest",
+                  "lineNumber": 99
+                },
+                {
+                  "name": "register",
+                  "method": "post",
+                  "parameters": [
+                    { "name": "registerRequest", "type": "RegisterRequest" }
+                  ],
+                  "returnType": "AuthResponse|http:BadRequest|http:Conflict",
+                  "lineNumber": 119
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "fileName": "types.bal",
+        "path": "./types.bal",
+        "type": "module",
+        "lineCount": 66,
         "ast": {
           "imports": [],
           "exports": [
@@ -17,250 +120,216 @@
               "kind": "export",
               "lineNumber": 2,
               "definition": {
-                "type": "object",
+                "type": "record",
                 "startLine": 2,
                 "endLine": 5,
                 "properties": [
-                  { "name": "username", "type": "string" },
-                  { "name": "password", "type": "string" },
-                  { "name": "email", "type": "string", "optional": true }
+                  { "name": "id", "type": "int" },
+                  { "name": "name", "type": "string" },
+                  { "name": "email", "type": "string" }
                 ]
               }
             },
             {
-              "name": "validateUsername",
-              "type": "function",
+              "name": "CreateUserRequest",
+              "type": "type",
               "kind": "export",
               "lineNumber": 7,
-              "parameters": [
-                { "name": "username", "type": "string" }
-              ],
-              "returnType": "boolean"
+              "definition": {
+                "type": "record",
+                "startLine": 7,
+                "endLine": 10,
+                "properties": [
+                  { "name": "name", "type": "string" },
+                  { "name": "email", "type": "string" }
+                ]
+              }
             },
             {
-              "name": "validatePassword",
-              "type": "function",
+              "name": "Product",
+              "type": "type",
               "kind": "export",
-              "lineNumber": 11,
-              "parameters": [
-                { "name": "password", "type": "string" }
-              ],
-              "returnType": "boolean"
+              "lineNumber": 13,
+              "definition": {
+                "type": "record",
+                "startLine": 13,
+                "endLine": 17,
+                "properties": [
+                  { "name": "id", "type": "int" },
+                  { "name": "name", "type": "string" },
+                  { "name": "price", "type": "decimal" },
+                  { "name": "category", "type": "string" }
+                ]
+              }
             },
             {
-              "name": "validateEmail",
-              "type": "function",
-              "kind": "export",
-              "lineNumber": 15,
-              "parameters": [
-                { "name": "email", "type": "string" }
-              ],
-              "returnType": "boolean"
-            },
-            {
-              "name": "resetPassword",
-              "type": "function",
+              "name": "CreateProductRequest",
+              "type": "type",
               "kind": "export",
               "lineNumber": 19,
-              "parameters": [
-                { "name": "user", "type": "User" },
-                { "name": "newPassword", "type": "string" }
-              ],
-              "returnType": "string"
+              "definition": {
+                "type": "record",
+                "startLine": 19,
+                "endLine": 23,
+                "properties": [
+                  { "name": "name", "type": "string" },
+                  { "name": "price", "type": "decimal" },
+                  { "name": "category", "type": "string" }
+                ]
+              }
+            },
+            {
+              "name": "Order",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 26,
+              "definition": {
+                "type": "record",
+                "startLine": 26,
+                "endLine": 32,
+                "properties": [
+                  { "name": "id", "type": "int" },
+                  { "name": "userId", "type": "int" },
+                  { "name": "products", "type": "Product[]" },
+                  { "name": "totalAmount", "type": "decimal" },
+                  { "name": "status", "type": "string" }
+                ]
+              }
+            },
+            {
+              "name": "CreateOrderRequest",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 34,
+              "definition": {
+                "type": "record",
+                "startLine": 34,
+                "endLine": 37,
+                "properties": [
+                  { "name": "userId", "type": "int" },
+                  { "name": "productIds", "type": "int[]" }
+                ]
+              }
+            },
+            {
+              "name": "LoginRequest",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 40,
+              "definition": {
+                "type": "record",
+                "startLine": 40,
+                "endLine": 43,
+                "properties": [
+                  { "name": "email", "type": "string" },
+                  { "name": "password", "type": "string" }
+                ]
+              }
+            },
+            {
+              "name": "RegisterRequest",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 45,
+              "definition": {
+                "type": "record",
+                "startLine": 45,
+                "endLine": 49,
+                "properties": [
+                  { "name": "name", "type": "string" },
+                  { "name": "email", "type": "string" },
+                  { "name": "password", "type": "string" }
+                ]
+              }
+            },
+            {
+              "name": "AuthResponse",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 51,
+              "definition": {
+                "type": "record",
+                "startLine": 51,
+                "endLine": 54,
+                "properties": [
+                  { "name": "token", "type": "string" },
+                  { "name": "message", "type": "string" }
+                ]
+              }
+            },
+            {
+              "name": "HealthStatus",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 56,
+              "definition": {
+                "type": "record",
+                "startLine": 56,
+                "endLine": 60,
+                "properties": [
+                  { "name": "status", "type": "string" },
+                  { "name": "timestamp", "type": "string" },
+                  { "name": "version", "type": "string" }
+                ]
+              }
+            },
+            {
+              "name": "ServerStatus",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 62,
+              "definition": {
+                "type": "record",
+                "startLine": 62,
+                "endLine": 66,
+                "properties": [
+                  { "name": "status", "type": "string" },
+                  { "name": "uptime", "type": "int" },
+                  { "name": "activeConnections", "type": "int" }
+                ]
+              }
+            },
+            {
+              "name": "ErrorMessage",
+              "type": "type",
+              "kind": "export",
+              "lineNumber": 68,
+              "definition": {
+                "type": "record",
+                "startLine": 68,
+                "endLine": 71,
+                "properties": [
+                  { "name": "message", "type": "string" }
+                ]
+              }
             }
           ],
           "statements": []
         }
-      },
-      {
-        "fileName": "login.ts",
-        "path": "./login.ts",
-        "type": "module",
-        "lineCount": 25,
-        "ast": {
-          "imports": [
-            {
-              "source": "./auth",
-              "lineNumber": 2,
-              "imports": [
-                { "name": "User", "type": "type", "importType": "named" },
-                { "name": "validateUsername", "type": "function", "importType": "named" },
-                { "name": "validatePassword", "type": "function", "importType": "named" }
-              ]
-            }
-          ],
-          "exports": [
-            {
-              "name": "login",
-              "type": "function",
-              "kind": "export",
-              "lineNumber": 6,
-              "parameters": [
-                { "name": "username", "type": "string" },
-                { "name": "password", "type": "string" }
-              ],
-              "returnType": "string"
-            },
-            {
-              "name": "getCurrentUser",
-              "type": "function",
-              "kind": "export",
-              "lineNumber": 17,
-              "parameters": [],
-              "returnType": "string | null"
-            },
-            {
-              "name": "setCurrentUser",
-              "type": "function",
-              "kind": "export",
-              "lineNumber": 20,
-              "parameters": [
-                { "name": "username", "type": "string | null" }
-              ],
-              "returnType": "void"
-            }
-          ],
-          "statements": [
-            {
-              "type": "variable_declaration",
-              "name": "mockUsers",
-              "varType": "User[]",
-              "lineNumber": 5,
-              "isConstant": true
-            },
-            {
-              "type": "variable_declaration",
-              "name": "currentUser",
-              "varType": "string | null",
-              "lineNumber": 9,
-              "isConstant": false
-            },
-            {
-              "type": "console_log",
-              "lineNumber": 23,
-              "arguments": ["login(\"alice\", \"password123\")"]
-            },
-            {
-              "type": "console_log",
-              "lineNumber": 24,
-              "arguments": ["getCurrentUser()"]
-            }
-          ]
-        }
-      },
-      {
-        "fileName": "signout.ts",
-        "path": "./signout.ts",
-        "type": "module",
-        "lineCount": 12,
-        "ast": {
-          "imports": [
-            {
-              "source": "./login",
-              "lineNumber": 2,
-              "imports": [
-                { "name": "getCurrentUser", "type": "function", "importType": "named" },
-                { "name": "setCurrentUser", "type": "function", "importType": "named" }
-              ]
-            }
-          ],
-          "exports": [
-            {
-              "name": "signout",
-              "type": "function",
-              "kind": "export",
-              "lineNumber": 4,
-              "parameters": [],
-              "returnType": "string"
-            }
-          ],
-          "statements": [
-            {
-              "type": "console_log",
-              "lineNumber": 11,
-              "arguments": ["signout()"]
-            }
-          ]
-        }
-      },
-      {
-        "fileName": "signup.ts",
-        "path": "./signup.ts",
-        "type": "module",
-        "lineCount": 22,
-        "ast": {
-          "imports": [
-            {
-              "source": "./auth",
-              "lineNumber": 1,
-              "imports": [
-                { "name": "User", "type": "type", "importType": "named" }
-              ]
-            },
-            {
-              "source": "./auth",
-              "lineNumber": 2,
-              "imports": [
-                { "name": "validateUsername", "type": "function", "importType": "named" },
-                { "name": "validatePassword", "type": "function", "importType": "named" },
-                { "name": "validateEmail", "type": "function", "importType": "named" }
-              ]
-            }
-          ],
-          "exports": [
-            {
-              "name": "signup",
-              "type": "function",
-              "kind": "export",
-              "lineNumber": 5,
-              "parameters": [
-                { "name": "username", "type": "string" },
-                { "name": "password", "type": "string" },
-                { "name": "email", "type": "string", "optional": true }
-              ],
-              "returnType": "User | string"
-            }
-          ],
-          "statements": [
-            {
-              "type": "variable_declaration",
-              "name": "newUser",
-              "varType": "User",
-              "lineNumber": 16,
-              "isConstant": true
-            },
-            {
-              "type": "console_log",
-              "lineNumber": 21,
-              "arguments": ["user"]
-            }
-          ]
-        }
       }
     ],
-    "totalLines": 79,
-    "totalFunctions": 8,
-    "totalTypes": 1,
+    "totalLines": 204,
+    "totalFunctions": 10,
+    "totalTypes": 15,
     "summary": {
-      "exportedFunctions": [
-        { "name": "validateUsername", "file": "auth.ts" },
-        { "name": "validatePassword", "file": "auth.ts" },
-        { "name": "validateEmail", "file": "auth.ts" },
-        { "name": "resetPassword", "file": "auth.ts" },
-        { "name": "login", "file": "login.ts" },
-        { "name": "getCurrentUser", "file": "login.ts" },
-        { "name": "setCurrentUser", "file": "login.ts" },
-        { "name": "signout", "file": "signout.ts" },
-        { "name": "signup", "file": "signup.ts" }
-      ],
+      "exportedFunctions": [],
       "exportedTypes": [
-        { "name": "User", "file": "auth.ts" }
+        "User",
+        "CreateUserRequest",
+        "Product",
+        "CreateProductRequest",
+        "Order",
+        "CreateOrderRequest",
+        "LoginRequest",
+        "RegisterRequest",
+        "AuthResponse",
+        "HealthStatus",
+        "ServerStatus",
+        "ErrorMessage"
       ],
       "dependencies": {
-        "login.ts": ["./auth"],
-        "signup.ts": ["./auth"],
-        "signout.ts": ["./login"],
-        "auth.ts": []
+        "main.bal": ["types.bal"],
+        "types.bal": []
       }
     }
   }
