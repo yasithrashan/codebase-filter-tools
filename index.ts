@@ -60,31 +60,31 @@ const queryAST = tool({
   },
 });
 
-// === Main run ===
 (async () => {
   const response = await generateText({
     model: openai("gpt-4.1-mini"),
     tools: { queryAST },
     stopWhen: stepCountIs(15),
     prompt: `
-You are an expert software engineer specializing in reading and understanding large codebases.
+You are a software engineer expert in reading, understanding, and modifying large codebases.
 
 ## Your Resources
 1. **Project Summary (bal.md):**
+This file contains the summary of the project codebase to help you understand structure, modules, and main logic. Use this to decide what files, functions, or services are relevant to the user query.
 ${balMdContent}
 
-2. **Tool Available:** "QueryAST" — fetches specific AST nodes.
-3. **AST:** The project's AST is available to the tool.
+2. **Tool Available:** "QueryAST" — fetches specific AST nodes for given symbols.
+3. **AST:** The project's AST is fully available to the tool.
 
 ## Task
-Follow these steps:
-- Understand user query
-- Decide relevant symbols
-- Call QueryAST tool
-- Modify code if needed
-- Return the updated code only, without questions
+- Understand the user query.
+- Using bal.md, identify the relevant context such as files, functions, or services that need modification.
+- Use the QueryAST tool to fetch AST context when needed.
+- Modify the code accordingly to exactly fulfill the user request.
+- Return only the corrected Ballerina code as the final output (no explanations, no questions).
 
-User Query: ${userQuery}
+## User Query
+${userQuery}
     `,
   });
 
